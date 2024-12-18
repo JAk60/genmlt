@@ -83,16 +83,16 @@ class MissionData(BaseModel):
     # action_id: Optional[str] = Field(default='', alias='ACTION_ID_40c07880ecb08feb0462be9ca3c29fdf0514e3914d')
     category: str = Field(min_length=1, max_length=100, alias='Category')
     sub_mission: Optional[str] = Field(default=None, alias='Sub - mission')
+    Criticality: Optional[str] = Field(default=None, alias='Criticality')
     level: str = Field(min_length=1, max_length=50, alias='Level')
     action: str = Field(min_length=1, max_length=100, alias='Action')
     entity: str = Field(min_length=1, max_length=50, alias='Entity')
     from_field: str = Field(min_length=1, max_length=50, alias='From')
-    time: str = Field(min_length=1, max_length=50, alias='Time')
-    location: str = Field(min_length=1, max_length=100, alias='Location')
+    # time: str = Field(min_length=1, max_length=50, alias='Time')
+    # location: str = Field(min_length=1, max_length=100, alias='Location')
     task_objective: List[str] = Field(default=[], alias='Task Objective')
     objective_function: List[str] = Field(default=[], alias='Objective function')
-    hard_constraints: List[str] = Field(default=[], alias='Hard Constraints')
-    soft_constraints: List[str] = Field(default=[], alias='Soft Constraints')
+    constraints: List[str] = Field(default=[], alias='Constraints')
 
 CSV_FILE_PATH = 'data/mission_data.csv'
 
@@ -134,10 +134,10 @@ async def log_mission_data(request: Request):
             # Get all fields from the original input keys
             fieldnames = [
                 'id', 'Scenario',
-                'Category', 'Sub - mission', 'Level', 'Action', 
-                'Entity', 'From', 'Time', 'Location', 
+                'Category', 'Sub - mission','Criticality', 'Level', 'Action', 
+                'Entity', 'From',
                 'Task Objective', 'Objective function', 
-                'Hard Constraints', 'Soft Constraints', 
+                'Constraints', 
                 
             ]
 
@@ -156,8 +156,7 @@ async def log_mission_data(request: Request):
 
             # Convert list fields to semicolon-separated strings
             list_fields = [
-                'Task Objective', 'Objective function', 
-                'Hard Constraints', 'Soft Constraints'
+                'Task Objective', 'Objective function', 'Constraints'
             ]
             for field in list_fields:
                 if csv_row.get(field):

@@ -5,6 +5,7 @@ import { getParagraphs, Paragraph } from "@/app/Paragraphs";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, ArrowRight, Mountain } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useFormStatus } from "react-dom";
@@ -17,19 +18,22 @@ const categories = {
 		"Sortie",
 		"Humanitarian",
 		"Fleet Support",
+		"Miscellaneous",
 	],
-	Level: ["Fleet", "Ship", "Equipment"],
-	Action: ["Select K out of N", "Identify", "Evaluate"],
-	Entity: ["Ship", "Equipment", "Workshop"],
-	From: ["Fleet", "Ships", "Equipment", "Workshops"],
-	Time: ["From Paragraph"],
-	Location: ["From Paragraph"],
+	Criticality: ["High","Medium","Low"],
+	Level: ["Fleet", "Ship", "Equipment","None"],
+	Action: ["Select K out of N", "Identify", "Evaluate","None"],
+	Entity: ["Ship", "Equipment", "Workshop","None"],
+	From: ["Fleet", "Ships", "Equipment", "Workshops","None"],
+	// Time: ["From Paragraph"],
+	// Location: ["From Paragraph"],
 	"Task Objective": [
 		"Interrogation and interception",
 		"Gun firing",
 		"Missile firing",
 		"Search and rescue",
 		"Maintenance scheduling",
+		"Miscellaneous"
 	],
 	"Objective function": [
 		"Minimum risk",
@@ -39,8 +43,9 @@ const categories = {
 		"Maximum reliability",
 		"Maximum conformance",
 		"Minimum downtime",
+		"None"
 	],
-	"Hard Constraints": [
+	Constraints: [
 		"Capability",
 		"Speed",
 		"Endurance",
@@ -51,16 +56,14 @@ const categories = {
 		"Risk score",
 		"Balancing loads",
 		"Workshop availability",
-		"Manpower availability",
 		"Conformance",
-	],
-	"Soft Constraints": [
 		"Fleet availability",
 		"Ship class",
 		"Working hours",
 		"Manpower availability",
 		"Logistic time",
 		"Activity sequences",
+		"None"
 	],
 };
 
@@ -75,6 +78,7 @@ function SubmitButton() {
 }
 
 export default function CategoryForm() {
+	const { toast } = useToast()
 	const [currParaId, setCurrParaId] = useState<number>(1);
 	const [paragraphs, setParagraphs] = useState<Paragraph[]>([]);
 
@@ -108,7 +112,20 @@ export default function CategoryForm() {
 		}
 
 		// Call the existing onSubmit action
-		await onSubmit(formData);
+		const res= await onSubmit(formData);
+		console.log(res,"res--<")
+		if(res.success===false){
+			toast({
+				variant: "destructive",
+				title: `${res.message}`,
+			  })
+		}else{
+			toast({
+				variant: "default",
+				title: `${res.message}`,
+			  })
+		}
+		
 	};
 	return (
 		<div className="container mx-auto p-6">
@@ -162,9 +179,10 @@ export default function CategoryForm() {
 						</h2>
 						<div className="space-y-6 flex-grow">
 							{Object.entries(categories).map(
-								([category, subcategories]) => (
+								([category, subcategories],idx:number) => (
 									<div key={category}>
-										<h3 className="text-md font-medium mb-2">
+										<h3 className="flex text-md font-medium mb-2">
+											{idx + 1} :- 
 											{category}
 										</h3>
 										<div className="grid grid-cols-2 gap-2">
